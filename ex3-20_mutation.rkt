@@ -31,6 +31,3 @@
 (car x)
 (cdr x)
 
-(set! car (lambda (x) x))
-(car 'done)
-

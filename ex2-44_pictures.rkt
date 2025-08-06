@@ -299,8 +299,8 @@
                              (shift-origin
                               (_hexagons (dec n) (not flipv?) 'top)
                               0 (if flipv? 1 (- 1)))))
-    (define chance-scaled 0.9)
-    (define chance-missing 0.1)
+    (define chance-scaled 0.8)
+    (define chance-missing 0.2)
     (define (missing?) (< (random 1.0) chance-missing))
     (if (= n 0)
         current
