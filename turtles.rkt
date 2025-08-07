@@ -85,9 +85,12 @@
             (return (λ (t) (maybe-iter t)))
             (turn (* -2 angle) _)
             (return (λ (t) (maybe-iter t))))))
-  (iter n 0 t))
+  (return t (λ (t) (iter n 0 t))))
 
 (~> t
     (turn 90 _)
-    (tree 15 _)
+    (tree 12 _)
+    (turn -90 _)
+    (move -100 _)
+    (draw 200 _)
     turtles-pict)
