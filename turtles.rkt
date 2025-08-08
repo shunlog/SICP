@@ -9,9 +9,9 @@
 
 
 ;;; turtles? (-> turtles? turtles?) -> turtles?
-;;; Returns the drawing (f t)
-;;; but with the turtles and pen from t
-(define (return t f)
+;;; Executes (f t) to get a drawing,
+;;; but then restores the turtles and pen from original t
+(define (with-restore t f)
   (define color (turtles-pen-color t))
   (define width (turtles-pen-width t))
   (define state (turtle-state t))
@@ -22,7 +22,7 @@
 
 
 (~> t
-    (return (λ~>
+    (with-restore (λ~>
               (set-pen-color "red")
               (draw 200 _)
               (set-pen-width 3)
@@ -51,22 +51,26 @@
     (turn -90 _)
     (set-pen-color "green")
     (draw 100 _)
-    (return _ (λ~>
-               (set-pen-color "blue")
-               (set-pen-width 0.2)
-               (multiply-spaced 10 _ (λ (t) (turn 20 (draw 10 t))))))
+    (with-restore 
+     (λ~>
+      (set-pen-color "blue")
+      (set-pen-width 0.2)
+      (multiply-spaced 10 _ (λ (t) (turn 20 (draw 10 t))))))
     (turn -90 _)
     (set-pen-color "red")
     (draw 100 _)
     turtles-pict)
 
 
-;;; turtle? -> turtle?
+;;; natural? turtle? -> turtle?
+;;; draw a tree with n levels of depth
 (define (tree n t)
   (define (iter n depth t)
+    (define len-scale (/ (random 70 99) 100))
+    (define width-scale (/ (random 70 80) 100))
+    (define width (* 6 (expt width-scale depth)))
+    (define length (* 30 (expt len-scale depth)))
     (define (draw-branch t)
-      (define length
-        (+ 10 (* 4 (/ n (add1 depth)))))
       (draw length t))
     (define (maybe-iter t)
       (define chance
@@ -76,16 +80,16 @@
           (iter (sub1 n) (add1 depth) t)))
     (define angle
       (+ 10 (/ 25 (+ 1 depth))))
-    (if (= n 0)
+    (if (= depth n)
         t
         (~> t
-            (set-pen-width (+ 1 (* 0.3 n)))
+            (set-pen-width width)
             draw-branch
             (turn angle _)
-            (return (λ (t) (maybe-iter t)))
+            (with-restore (λ (t) (maybe-iter t)))
             (turn (* -2 angle) _)
-            (return (λ (t) (maybe-iter t))))))
-  (return t (λ (t) (iter n 0 t))))
+            (with-restore (λ (t) (maybe-iter t))))))
+  (with-restore t (λ (t) (iter n 0 t))))
 
 (~> t
     (turn 90 _)
@@ -94,3 +98,16 @@
     (move -100 _)
     (draw 200 _)
     turtles-pict)
+
+
+;; (define (hex-tree n t [depth 0])
+;;   (define (branch-left t)
+;;     (~> t
+;;         (draw 20 _)
+;;         (turn 60)
+;;         (hex-tree n t (add1 depth))
+;;         ))
+;;   (with-restore
+;;     t
+;;     (λ~> 
+;;                     )))
